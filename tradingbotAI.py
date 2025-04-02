@@ -112,21 +112,17 @@ def calculate_position_size(price, capital):
     position_size = risk_amount / (stop_loss_amount * (1 + trading_fee_percent))
     return min(position_size, capital / price)
 
-# Execute trade with risk control
-def execute_trade(lstm_signal, rsi, price, position_size, loss_streak):
-    if loss_streak >= max_consecutive_losses:
-        log_and_print("Max consecutive losses reached. Pausing trading.")
-        return None, 0, 0, 0
-    
-    if lstm_signal == 1 and rsi < rsi_overbought:
-        stop_loss = price * (1 - stop_loss_percent)
-        take_profit = price * (1 + take_profit_percent)
-        log_and_print(f"BUY {position_size:.6f} BTC at {price:.2f}, SL: {stop_loss:.2f}, TP: {take_profit:.2f}")
-        return 'long', position_size, stop_loss, take_profit
-    elif lstm_signal == 0 and rsi > rsi_oversold:
-        log_and_print(f"SELL {position_size:.6f} BTC at {price:.2f}")
-        return None, 0, 0, 0
-    return None, 0, 0, 0
+# Backtest function
+def backtest(df, model, scaler, features):
+    log_and_print("Starting backtest...")
+    df = calculate_indicators(df)
+    X, _, _, _, valid_index = prepare_lstm_data(df)
+    predictions = model.predict(X, verbose=0)
+    df['lstm_signal'] = np.nan
+    df.loc[valid_index, 'lstm_signal'] = (predictions > 0.5).astype(int)
+    df['lstm_signal'] = df['lstm_signal'].fillna(method='ffill')
+    df['prev_lstm_signal'] = df['lstm_signal'].shift(1)
+    return df
 
 # Main trading loop
 def trading_bot():
@@ -140,6 +136,8 @@ def trading_bot():
     df = fetch_data(limit=500)
     X, y, scaler, features, _ = prepare_lstm_data(df)
     model = train_lstm_model(X, y)
+    df = backtest(df, model, scaler, features)
+    log_and_print("Backtest complete.")
     
     while True:
         try:
