@@ -1,0 +1,82 @@
+Giải thích Code
+Code này là một bot giao dịch tự động sử dụng mô hình LSTM (Long Short-Term Memory) để dự đoán giá Bitcoin trên nhiều sàn giao dịch khác nhau. Nó bao gồm các chức năng chính như thu thập dữ liệu, tính toán chỉ báo kỹ thuật, huấn luyện mô hình LSTM, backtest, và thực hiện giao dịch trực tiếp.
+
+1. Cấu hình & Khởi tạo
+logging: Ghi nhật ký quá trình chạy bot.
+
+initialize_exchange(): Cho phép chọn sàn giao dịch (ví dụ: Binance, Bitget).
+
+EXCHANGE_NAME, API_KEY, API_SECRET, PASSWORD: Thông tin API để kết nối với sàn.
+
+2. Các Tham Số Giao Dịch
+symbol: Cặp tiền điện tử (BTC/USDT).
+
+timeframe: Khung thời gian (5 phút).
+
+capital: Vốn ban đầu (1000 USDT).
+
+risk_per_trade: Rủi ro mỗi lệnh (2%).
+
+stop_loss_percent, take_profit_percent: Mức cắt lỗ (1%) và chốt lời (3%).
+
+short_sma_period, long_sma_period: Số kỳ của SMA ngắn hạn và dài hạn.
+
+rsi_period, rsi_overbought, rsi_oversold: RSI để xác định quá mua/quá bán.
+
+lstm_timesteps: Số bước thời gian của mô hình LSTM.
+
+max_consecutive_losses: Ngừng giao dịch sau khi thua liên tục X lần.
+
+trading_fee_percent: Phí giao dịch (0.1%).
+
+3. Thu Thập & Xử Lý Dữ Liệu
+fetch_data(): Lấy dữ liệu OHLCV từ sàn.
+
+calculate_indicators(): Tính SMA, RSI.
+
+4. Chuẩn Bị Dữ Liệu Cho LSTM
+Tạo biến mục tiêu (target) dự đoán giá tăng/giảm.
+
+Chuẩn hóa dữ liệu bằng MinMaxScaler().
+
+5. Huấn Luyện Mô Hình LSTM
+Mô hình LSTM với 2 tầng LSTM, Dropout và Dense(sigmoid).
+
+Dùng binary_crossentropy để phân loại.
+
+Huấn luyện với 10 epochs và batch size = 32.
+
+6. Backtest (Kiểm Tra Hiệu Suất Trước Khi Giao Dịch Thật)
+Chạy trên dữ liệu lịch sử để kiểm tra độ chính xác.
+
+Tạo tín hiệu giao dịch dựa trên dự đoán của mô hình.
+
+7. Chiến Lược Giao Dịch
+Nếu mô hình dự đoán tăng, kiểm tra RSI trước khi vào lệnh.
+
+Xác định kích thước vị thế với calculate_position_size().
+
+Tự động cắt lỗ/chốt lời khi đạt điều kiện.
+
+Giới hạn chuỗi thua lỗ (max_consecutive_losses) để tránh rủi ro.
+
+8. Vòng Lặp Giao Dịch Chính
+Liên tục lấy dữ liệu mới, dự đoán và thực hiện giao dịch.
+
+Cập nhật số dư vốn sau mỗi giao dịch.
+
+Nếu bị lỗi, ghi vào nhật ký và thử lại sau 60 giây.
+
+9. Chạy Bot
+Gọi trading_bot() khi script khởi chạy.
+
+Ghi nhật ký hoạt động và trạng thái vốn theo thời gian thực.
+
+🚀 Cải Tiến So Với Phiên Bản Cũ
+✅ Hỗ trợ nhiều sàn giao dịch (Binance, Bitget, v.v.)
+✅ Giới hạn chuỗi thua để bảo vệ vốn
+✅ Tính phí giao dịch vào chiến lược giao dịch
+✅ Ghi nhật ký hoạt động giúp theo dõi hiệu suất
+✅ Backtest đầy đủ trước khi giao dịch thực tế
+
+Mình có thể tối ưu thêm gì nữa không? 🚀
