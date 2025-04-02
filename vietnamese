@@ -1,4 +1,4 @@
-Giải thích Code
+
 Code này là một bot giao dịch tự động sử dụng mô hình LSTM (Long Short-Term Memory) để dự đoán giá Bitcoin trên nhiều sàn giao dịch khác nhau. Nó bao gồm các chức năng chính như thu thập dữ liệu, tính toán chỉ báo kỹ thuật, huấn luyện mô hình LSTM, backtest, và thực hiện giao dịch trực tiếp.
 
 1. Cấu hình & Khởi tạo
@@ -79,4 +79,4 @@ Ghi nhật ký hoạt động và trạng thái vốn theo thời gian thực.
 ✅ Ghi nhật ký hoạt động giúp theo dõi hiệu suất
 ✅ Backtest đầy đủ trước khi giao dịch thực tế
 
-Mình có thể tối ưu thêm gì nữa không? 🚀
+
